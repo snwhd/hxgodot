@@ -279,8 +279,34 @@ abstract Vector3(__Vector3) from __Vector3 to __Vector3 {
     }
 
     public function rotated(p_axis:Vector3, p_angle:Float):Vector3 {
+        var sq = new Vector3(p_axis.x * p_axis.x, p_axis.y * p_axis.y, p_axis.z * p_axis.z);
+        var sin = Math.sin(p_angle);
+        var cos = Math.cos(p_angle);
+
+        var v0 = new Vector3(sq.x + cos *(1.0 - sq.x), 0, 0);
+        var v1 = new Vector3(0, sq.y + cos *(1.0 - sq.y), 0);
+        var v2 = new Vector3(0, 0, sq.z + cos *(1.0 - sq.z));
+        var t = 1.0 - cos;
+
+        var xyzt = p_axis.x * p_axis.y * t;
+        var zyxs = p_axis.z * sin;
+        v0.y = xyzt - zyxs;
+        v1.x = xyzt + zyxs;
+
+        xyzt = p_axis.x * p_axis.z * t;
+        zyxs = p_axis.y * sin;
+        v0.z = xyzt + zyxs;
+        v2.x = xyzt - zyxs;
+
+        xyzt = p_axis.y * p_axis.z * t;
+        zyxs = p_axis.x * sin;
+        v1.z = xyzt - zyxs;
+        v2.y = xyzt + zyxs;
+
         var r:Vector3 = copy();
-        r.rotate(p_axis, p_angle);
+        r.x = v0.dot(this);
+        r.y = v1.dot(this);
+        r.z = v2.dot(this);
         return r;
     }
 
